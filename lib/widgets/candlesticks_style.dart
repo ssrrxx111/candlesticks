@@ -45,6 +45,7 @@ CandlesticksStyle DefaultDarkCandleStyle = CandlesticksStyle(
   mhStyle: defaultMHStyle,
   rsiStyle: defaultRsiStyle,
   wrStyle: defaultWrStyle,
+  kdjStyle: defaultKdjStyle,
   macdStyle: defaultMacdStyle,
 
 );
