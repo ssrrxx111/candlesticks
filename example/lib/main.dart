@@ -19,16 +19,17 @@ CandlesticksStyle DefaultCandleStyle = DefaultDarkCandleStyle;
 class _MyAppState extends State<MyApp> {
   int count = 0;
 
+  Future<Stream<CandleData>> dataStreamFuture;
+  CandlesticksStyle style;
+
+  int lineMinite = 7 * 24 * 60;
+
   @override
   void initState() {
     super.initState();
-    //dataStreamFuture = DataSource.instance.initRBTC(1440);
-    dataStreamFuture = DataSource.instance.initRBTC(1);
+    dataStreamFuture = DataSource.instance.initRBTC(lineMinite);
     style = DefaultCandleStyle;
   }
-
-  Future<Stream<CandleData>> dataStreamFuture;
-  CandlesticksStyle style;
 
   @override
   Widget build(BuildContext context) {
@@ -65,21 +66,26 @@ class _MyAppState extends State<MyApp> {
 
                     });
                   },
-                )
+                  child: Text('k线类型'),
+                ),
+                
               ])),
           Expanded(
             flex: 10,
+            // 这里future解包出来拿到的是一个stream
             child: FutureBuilder<Stream<CandleData>>(
                 future: dataStreamFuture,
                 builder: (BuildContext context,
                     AsyncSnapshot<Stream<CandleData>> snapshot) {
+
+                  print('data: ${snapshot.data?.length}');
                   if ((snapshot.connectionState != ConnectionState.done) ||
                       (!snapshot.hasData) || (snapshot.data == null)) {
                     return Container();
                   }
                   return CandlesticksWidget(
 //                    durationMs: 86400000,
-                    durationMs: 60000,
+                    durationMs:  lineMinite * 60 * 1000 * 1.0,
                     dataStream: snapshot.data,
                     candlesticksStyle:style,
                   );

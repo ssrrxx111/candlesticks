@@ -24,13 +24,20 @@ class DemoApp extends StatelessWidget {
     Widget build(BuildContext context) {
         return RawGestureDetector(
             gestures: {
+                LongPressGesture: GestureRecognizerFactoryWithHandlers<
+                    LongPressGesture>(
+                        () => LongPressGesture(),
+                        (LongPressGesture instance) {
+                        instance.onLongPress = () => print('parent long press ');
+                    },
+                ),
                 AllowMultipleGestureRecognizer: GestureRecognizerFactoryWithHandlers<
                     AllowMultipleGestureRecognizer>(
                         () => AllowMultipleGestureRecognizer(),
                         (AllowMultipleGestureRecognizer instance) {
-                        instance.onTap = () => print('Episode 4 is best! (parent container) ');
+                        instance.onTap = () => print('parent tap ');
                     },
-                )
+                ),
             },
             behavior: HitTestBehavior.opaque,
             //父容器
@@ -40,12 +47,12 @@ class DemoApp extends StatelessWidget {
                     //用 RawGestureDetector 将两个容器包裹起来
                     child: RawGestureDetector(
                         gestures: {
-                            AllowMultipleGestureRecognizer:
+                            CustomHorizontalGesture:
                             GestureRecognizerFactoryWithHandlers<
-                                AllowMultipleGestureRecognizer>(
-                                    () => AllowMultipleGestureRecognizer(),  //构造函数
-                                    (AllowMultipleGestureRecognizer instance) {  //初始化器
-                                    instance.onTap = () => print('Episode 8 is best! (nested container)');
+                                CustomHorizontalGesture>(
+                                    () => CustomHorizontalGesture(),  //构造函数
+                                    (CustomHorizontalGesture instance) {  //初始化器
+                                    instance.onUpdate = (detail) => print('Episode 8 is best! (nested container ${detail.toString()})');
                                 },
                             )
                         },
@@ -67,6 +74,20 @@ class DemoApp extends StatelessWidget {
 // 识别器并进行清理。但是我们修改了它，它实际上是手动添加的，以代替识别器被处理。
 // 结果是你将有两个识别器在竞技场中获胜。这是双赢。
 class AllowMultipleGestureRecognizer extends TapGestureRecognizer {
+    @override
+    void rejectGesture(int pointer) {
+        acceptGesture(pointer);
+    }
+}
+
+class LongPressGesture extends LongPressGestureRecognizer {
+    @override
+    void rejectGesture(int pointer) {
+        acceptGesture(pointer);
+    }
+}
+
+class CustomHorizontalGesture extends HorizontalDragGestureRecognizer {
     @override
     void rejectGesture(int pointer) {
         acceptGesture(pointer);

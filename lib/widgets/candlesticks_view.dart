@@ -41,6 +41,12 @@ class CandlesticksView extends CandlesticksState {
 //      },
       onHorizontalDragEnd: onHorizontalDragEnd,
       onHorizontalDragUpdate: onHorizontalDragUpdate,
+      onHorizontalDragCancel: () {
+        print('srx onHorizontalDragCancel');
+      },
+      onHorizontalDragDown: (detail) {
+        print('srx onHorizontalDragDown');
+      },
 
       onScaleUpdate: onScaleUpdate,
       onScaleStart: handleScaleStart,
@@ -48,6 +54,7 @@ class CandlesticksView extends CandlesticksState {
       onTapDown: onTapDown,
       onTapUp: onTapUp,
       onLongPress: onLongPress,
+
 
       child: AnimatedBuilder(
           animation: Listenable.merge([

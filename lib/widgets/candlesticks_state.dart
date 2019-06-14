@@ -97,6 +97,7 @@ abstract class CandlesticksState extends State<CandlesticksWidget>
   }
 
   onCandleDataFinish(ExtCandleData candleData) {
+    print('srx onCandleDataFinish');
     if (uiCameraAnimation == null) {
       var maxX = candlesX.last + durationMs;
       var minX = maxX - durationMs * widget.candlesticksStyle.defaultViewPortX;
@@ -127,6 +128,7 @@ abstract class CandlesticksState extends State<CandlesticksWidget>
   }
 
   void onHorizontalDragEnd(DragEndDetails details) {
+    print('srx onHorizontalDragEnd');
     touching = false;
     //区间的最大值， 最小值。
     if (uiCameraAnimation == null) {
@@ -172,6 +174,7 @@ abstract class CandlesticksState extends State<CandlesticksWidget>
   }
 
   void onHorizontalDragUpdate(DragUpdateDetails details) {
+    print('srx onHorizontalDragUpdate');
     if (uiCameraAnimation == null) { //还没有初始化完成。
       return;
     }
@@ -213,6 +216,7 @@ abstract class CandlesticksState extends State<CandlesticksWidget>
   Offset startPosition;
 
   void handleScaleStart(ScaleStartDetails details) {
+    print('srx handleScaleStart');
     startPosition = details.focalPoint;
     startRangeX = uiCameraAnimation.value;
 
@@ -225,6 +229,7 @@ abstract class CandlesticksState extends State<CandlesticksWidget>
 
 
   onScaleUpdate(ScaleUpdateDetails details) {
+    print('srx onScaleUpdate');
     double scale = 1 / details.scale;
     /*
     var width = originWidth * scale;
@@ -272,6 +277,7 @@ abstract class CandlesticksState extends State<CandlesticksWidget>
   Offset touchPoint;
 
   onTapUp(TapUpDetails details) {
+    print('start onTapUp');
     RenderBox getBox = context.findRenderObject();
     var currentRangeX = uiCameraAnimation.value;
     touchPoint = getBox.globalToLocal(details.globalPosition);
@@ -292,11 +298,13 @@ abstract class CandlesticksState extends State<CandlesticksWidget>
   }
 
   onTapDown(TapDownDetails details) {
+    print('start onTapDown');
     RenderBox getBox = context.findRenderObject();
     touchPoint = getBox.globalToLocal(details.globalPosition);
   }
 
   onLongPress() {
+    print('start onLongPress');
     var currentRangeX = uiCameraAnimation.value;
     var worldX = currentRangeX.minX +
         (touchPoint.dx / context.size.width) * currentRangeX.width;

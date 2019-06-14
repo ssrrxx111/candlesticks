@@ -4,51 +4,52 @@ import 'dart:convert';
 import 'package:rxdart/rxdart.dart';
 import 'package:candlesticks/candlesticks.dart';
 
+const BASE_URL = "wss://market-api.dxb.com/sub";
+
 class DataSource {
+  static DataSource get instance => _getInstance();
 
-  static final DataSource instance = new DataSource
-      ._internal();
+  factory DataSource() => _getInstance();
 
-  factory DataSource() {
-    return instance;
+  static DataSource _instance;
+  DataSource._internal();
+  static DataSource _getInstance() {
+    if (_instance == null) {
+      _instance = DataSource._internal();
+    }
+    return _instance;
   }
 
-  ReplaySubject<CandleData> subject;
+  ReplaySubject<CandleData> tickerInfoSubject;
 
-  var channel;
+  IOWebSocketChannel socketChannel;
 
-  DataSource._internal();
-
-  Future<Stream<CandleData>> initTZB(int minute) async {
-    if(subject != null) {
-      subject.close();
-      subject = null;
+  Future<ReplaySubject<CandleData>> initTZB(int minute) async {
+    if (tickerInfoSubject != null) {
+      tickerInfoSubject.close();
+      tickerInfoSubject = null;
     }
-    subject = ReplaySubject<CandleData>();
+    tickerInfoSubject = ReplaySubject<CandleData>();
     var symbol = "eth_usdt";
-    if(channel != null) {
-      channel.sink.close();
-      channel = null;
+    if (socketChannel != null) {
+      socketChannel.sink.close();
+      socketChannel = null;
     }
 
-    channel = IOWebSocketChannel.connect(
-        "wss://ws.tokenbinary.io/sub");
+    socketChannel = IOWebSocketChannel.connect("wss://ws.tokenbinary.io/sub");
     /*
         channel.sink.add(
             '{"method":"pull_heart","data":{"time":"1541066934853"}}');
             */
-    channel.sink.add(
-        '{"method":"pull_gamble_user_market","data":{"market":"${symbol}","gamble":true}}');
-    channel.sink.add(
+    socketChannel.sink
+        .add('{"method":"pull_gamble_user_market","data":{"market":"${symbol}","gamble":true}}');
+    socketChannel.sink.add(
         '{"method":"pull_gamble_kline_graph","data":{"market":"${symbol}","k_line_type":"${minute}","k_line_count":"500"}}');
 
-    channel.stream.listen((request) {
+    socketChannel.stream.listen((request) {
       var msg = json.decode(utf8.decode(request));
-      int now = DateTime
-          .now()
-          .millisecond;
-      channel.sink.add(
-          '{"method":"pull_heart","data":{"time":"${now}"}}');
+      int now = DateTime.now().millisecond;
+      socketChannel.sink.add('{"method":"pull_heart","data":{"time":"${now}"}}');
       if (msg['method'] == 'push_gamble_kline_graph') {
         //print(msg['data']);
         List dataK = [];
@@ -66,31 +67,33 @@ class DataSource {
             //print(e);
           }
 
-          subject.sink.add(CandleData.fromArray(item));
+          tickerInfoSubject.add(CandleData.fromArray(item));
         });
       }
     });
-    return subject.stream;
+    return tickerInfoSubject.stream;
   }
 
-  Future<Stream<CandleData>> initRBTC(int minute) async {
-    if(subject != null) {
-      subject.close();
+  Future<ReplaySubject<CandleData>> initRBTC(int minute) async {
+    if (tickerInfoSubject != null) {
+      tickerInfoSubject.close();
+      tickerInfoSubject = null;
     }
-    subject = ReplaySubject<CandleData>();
+    tickerInfoSubject = ReplaySubject<CandleData>();
+    if (socketChannel != null) {
+      socketChannel.sink.close();
+      socketChannel = null;
+    }
 
-    var symbol = "del_pyc";
+    var symbol = "btc_usdt";
 
-    channel = IOWebSocketChannel.connect(
-        "wss://market-api.rbtc.io/sub");
-    channel.sink.add(
-        '{"method":"pull_heart","data":{"time":"1541066934853"}}');
-    channel.sink.add(
-        '{"method":"pull_user_market","data":{"market":"${symbol}"}}');
-    channel.sink.add(
+    socketChannel = IOWebSocketChannel.connect(BASE_URL);
+    socketChannel.sink.add('{"method":"pull_heart","data":{"time":"1541066934853"}}');
+    socketChannel.sink.add('{"method":"pull_user_market","data":{"market":"${symbol}"}}');
+    socketChannel.sink.add(
         '{"method":"pull_kline_graph","data":{"market":"${symbol}","k_line_type":"${minute}","k_line_count":"80"}}');
 
-    channel.stream.listen((request) {
+    socketChannel.stream.listen((request) {
       var msg = json.decode(utf8.decode(request));
       if (msg['method'] == 'push_kline_graph') {
         //print(msg['data']);
@@ -110,10 +113,10 @@ class DataSource {
           }
 
           dataK.add(d);
-          if(dataK.length >= 2) {
+          if (dataK.length >= 2) {
 //            print(dataK.last['time'] - dataK[dataK.length - 2]['time']);
           }
-          subject.sink.add(CandleData.fromArray(item));
+          tickerInfoSubject.add(CandleData.fromArray(item));
         });
 //        kChartsKey.currentState.data = data;
 //                print('pull_kline_graph');
@@ -121,6 +124,6 @@ class DataSource {
 //                channel.sink.close(5678, "raisin");
       }
     });
-    return subject.stream;
+    return tickerInfoSubject;
   }
 }
