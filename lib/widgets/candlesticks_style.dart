@@ -11,7 +11,7 @@ import 'package:candlesticks/widgets/floating/floating_style.dart';
 CandlesticksStyle DefaultDarkCandleStyle = CandlesticksStyle(
   backgroundColor: Color(0xFF060827),
   cameraDuration: Duration(milliseconds: 500),
-  initAfterNData: 50,
+  initAfterNData: 1,
   defaultViewPortX: 50,
   minViewPortX: 20,
   maxViewPortX: 256,
@@ -53,7 +53,7 @@ CandlesticksStyle DefaultDarkCandleStyle = CandlesticksStyle(
 CandlesticksStyle DefaultLightCandleStyle = CandlesticksStyle(
   backgroundColor: Color(0xffffffff),
   cameraDuration: Duration(milliseconds: 500),
-  initAfterNData: 50,
+  initAfterNData: 1,
   defaultViewPortX: 50,
   minViewPortX: 20,
   maxViewPortX: 256,
