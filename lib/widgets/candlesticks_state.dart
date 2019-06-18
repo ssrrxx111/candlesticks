@@ -97,7 +97,7 @@ abstract class CandlesticksState extends State<CandlesticksWidget>
   }
 
   onCandleDataFinish(ExtCandleData candleData) {
-    print('srx onCandleDataFinish');
+//    print('srx onCandleDataFinish');
     if (uiCameraAnimation == null) {
       var maxX = candlesX.last + durationMs;
       var minX = maxX - durationMs * widget.candlesticksStyle.defaultViewPortX;
